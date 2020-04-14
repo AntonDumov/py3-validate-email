@@ -1,6 +1,14 @@
 from http.client import HTTPResponse
 from logging import getLogger
-from os import geteuid
+
+import sys
+if sys.platform != 'win32':
+    from os import geteuid
+    get_user_id = geteuid
+else:
+    import getpass
+    get_user_id = getpass.getuser
+
 from pathlib import Path
 from tempfile import gettempdir, gettempprefix
 from threading import Thread
@@ -11,7 +19,7 @@ from urllib.request import Request, urlopen
 
 LOGGER = getLogger(__name__)
 TMP_PATH = Path(gettempdir()).joinpath(
-    f'{gettempprefix()}-py3-validate-email-{geteuid()}')
+    f'{gettempprefix()}-py3-validate-email-{get_user_id()}')
 TMP_PATH.mkdir(exist_ok=True)
 BLACKLIST_URL = (
     'https://raw.githubusercontent.com/martenson/disposable-email-domains/'
